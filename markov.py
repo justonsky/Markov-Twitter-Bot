@@ -47,7 +47,12 @@ def generate_sentence(words_dict, max_length=140):
     sentence = start
 
     while (True):
-        next_word = weighted_choice(words_dict[start].keys(), words_dict[start].values()),
+
+        try:
+            next_word = weighted_choice(words_dict[start].keys(), words_dict[start].values()),
+        except KeyError:
+            start = random.choice(list(words_dict.keys()))
+            continue
 
         if len(next_word) + len(result) > max_length:
             break
