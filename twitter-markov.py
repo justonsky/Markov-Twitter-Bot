@@ -81,7 +81,7 @@ if __name__ == '__main__':
                             sleep_on_rate_limit=True)
 
     print("Authenticated. Continuing, grasping tweets...")
-    
+
     for celebrity in args.twitter_handles:
         train(twitter_api, data_table, celebrity)
     
@@ -91,4 +91,4 @@ if __name__ == '__main__':
         # Generates a sentence, tweets it, then sleeps.
         text = markov.generate_sentence(data_table)
         twitter_api.PostUpdate(text)
-        time.sleep(120)'''
+        time.sleep(120)
