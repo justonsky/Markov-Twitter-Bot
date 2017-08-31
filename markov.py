@@ -54,7 +54,7 @@ def generate_sentence(words_dict, max_length=140):
             # Return the sentence as is.
             return result
 
-        if len(next_word) + len(result) >= max_length:
+        if len(str(next_word)) + len(result) >= max_length:
             break
 
         sentence += next_word

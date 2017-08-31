@@ -9,7 +9,10 @@ import markov
 import twitter
 
 parser = argparse.ArgumentParser(description='Markov chain text generator written in Python.')
-parser.add_argument('twitter_handles', nargs='+')
+parser.add_argument('step', metavar='N', type=int, nargs=1,
+                    help='Determines length of keys in the program\'s dictionary.')
+parser.add_argument('twitter_handles', type=str, nargs='+',
+                    help='List of twitter handles to use.')
 args = parser.parse_args()
 
 pickle_file = 'entries.pickle'
@@ -34,7 +37,7 @@ def dict_load(data, pickle_file):
         f.close()
 
 def train(api, data, person):
-    markov_prefix_length = 5 # Default
+    markov_prefix_length = int(args.step[0])
     tweet_since_count = None
     test = 1
 
