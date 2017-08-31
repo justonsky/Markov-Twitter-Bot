@@ -1,2 +1,1 @@
-pickle
 python-twitter

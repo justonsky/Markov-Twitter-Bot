@@ -4,7 +4,7 @@ Small, simple project, implementing a Markov Chain text generator bot in Python 
 
 ## Prerequisites
 
-This project uses the **pickle** library to store data, and **python-twitter** to access Twitter's API. You can install these two dependencies using `pip install -r requirements.txt`.
+This project uses the **python-twitter** library to access Twitter's API. You can install this using `pip3 install -r requirements.txt`, or simply `pip3 install python-twitter`.
 
 Additionally, to run this project *you will need application tokens from Twitter itself*, which you can do by [signing up](https://twitter.com/signup) for the service and creating a new application [on this link](https://apps.twitter.com/).  For reference you will need these four tokens:
 
