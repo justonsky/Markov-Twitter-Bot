@@ -9,52 +9,61 @@ import markov
 import twitter
 
 parser = argparse.ArgumentParser(description='Markov chain text generator written in Python.')
-parser.add_argument('step', metavar='N', type=int, nargs=1,
-                    help='Determines length of keys in the program\'s dictionary.')
-parser.add_argument('twitter_handles', type=str, nargs='+',
-                    help='List of twitter handles to use.')
+parser.add_argument('-n', metavar='N', type=int, nargs=1, help='Determines length of keys in the program\'s dictionary.')
+parser.add_argument('--handles', type=str, nargs='+', 
+                    help='List of twitter handles to use')
 args = parser.parse_args()
 
 pickle_file = 'entries.pickle'
 consumer_key = os.environ.get("TWEETUSER")
-consumer_secret = os.environ.get("TWEETPASS")
+consumer_secret  = os.environ.get("TWEETPASS")
 access_token_key = os.environ.get("TWEETACCESS")
 access_token_secret = os.environ.get("TWEETACCSECRET")
 
 
 def dict_save(data, pickle_file):
-    with open(pickle_file, 'ab') as f:
+    with open(pickle_file, 'a+b') as f:
         pickle.dump(data, f)
 
-def dict_load(data, pickle_file):
-    try:
-        f = open(pickle_file, 'rb')
-    except:
-        print("No pickle file detected, creating new one...")
-        dict_save(data, pickle_file)
-    else:
-        data = pickle.load(f)
-        f.close()
+def dict_load(pickle_file):
+
+    data = {}
+    with open(pickle_file, 'r+b') as f:
+
+        try:
+            data = pickle.load(f)
+        except EOFError:
+            if args.handles is None:
+                print("The entries file is currently empty. Perhaps provide a few Twitter handles for our bot to look at?")
+                sys.exit(2)
+        except FileNotFoundError:
+            f = open(pickle_file, 'w+b')
+            f.close()
+
+    return data
 
 def train(api, data, person):
-    markov_prefix_length = int(args.step[0])
-    tweet_since_count = None
-    test = 1
+    markov_prefix_length = int(args.n[0])
+    total = 0
+    check = 0
+    oldest = None
 
-    while(tweet_since_count != test):
-        test = tweet_since_count
+    # Grabbing initial list of tweets
+    tweets_list = api.GetUserTimeline(screen_name=person, count=1, max_id=oldest)
+
+    while tweets_list and (oldest != check):
         try:
             tweets_list = api.GetUserTimeline(screen_name=person, 
                                         count=200, 
                                         include_rts=False, 
-                                        max_id=tweet_since_count)
+                                        max_id=oldest)
         except:
             print('Something went wrong getting {person}\'s tweets. Going to next person.'.format(person=person))
-            dict_save(data, pickle_file)
             break
-        else:
-            tweet_since_count = tweets_list[-1].id
 
+        total += len(tweets_list)
+        check = oldest
+        oldest = tweets_list[-1].id
         tweet_text = [status.text for status in tweets_list]
 
         # Pass text from status update to markov chain dictionary
@@ -66,32 +75,35 @@ def train(api, data, person):
                 else:
                     markov.build_dict(data, key, value)
 
+        print("Processed ", total, "tweets, last tweet ID being: ", oldest)
         # Save dictionary to pickle
         dict_save(data, pickle_file)
 
 
 if __name__ == '__main__':
-    data_table = {}
-    dict_load(data_table, pickle_file)
-    print("Dictionary loaded! Continuing...")
-    print("Length of data table: ", len(data_table))
 
+    data_table = dict_load(pickle_file)
+    print(len(data_table))
     # Authentication using OAuth
-    twitter_api = twitter.Api(consumer_key, 
-                            consumer_secret, 
-                            access_token_key, 
-                            access_token_secret, 
-                            sleep_on_rate_limit=True)
+    try:
+        twitter_api = twitter.Api(consumer_key, 
+                                consumer_secret, 
+                                access_token_key, 
+                                access_token_secret, 
+                                sleep_on_rate_limit=True)
+    except:
+        print("Something went wrong with authentication. Did you set your environment variables properly?")
+        sys.exit(2)
 
-    print("Authenticated. Continuing, grasping tweets...")
-
-    for celebrity in args.twitter_handles:
-        train(twitter_api, data_table, celebrity)
-    
-    print("Tweets from list of accounts processed. Moving to sentence generation.")
-
+    if not args.handles is None:
+        for celebrity in args.handles:
+            print("Fetching ", celebrity, "'s tweets...")
+            train(twitter_api, data_table, celebrity)
+        
+    print("Generating tweets...")
     while(True):
         # Generates a sentence, tweets it, then sleeps.
         text = markov.generate_sentence(data_table)
-        twitter_api.PostUpdate(text)
-        time.sleep(120)
+        twitter_api.PostUpdate(text.capitalize())
+        print("New tweet: ", text)
+        time.sleep(60)

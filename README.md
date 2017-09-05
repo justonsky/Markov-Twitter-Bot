@@ -26,4 +26,6 @@ export TWEETACCESS=access_key
 export TWEETACCSECRET=access_secret
 ```
 
-From there, you can simply run `twitter-markov.py` followed by a list of twitter handles you want to use to train it. For example: `python3 twitter-markov.py twitter_handle1 twitter_handle2`. It will build a dictionary using their tweets and then issue tweets every 2 minutes.
+From there, you can simply run `twitter-markov.py` followed by a list of twitter handles you want to use to train it. For example: `python3 twitter-markov.py <some_random_number> <twitter_handle1> <twitter_handle2>`. It will build a dictionary using their tweets and then generate a unique tweet based on theirs every 2 minutes.
+
+From there, you can simply run `twitter-markov.py` followed by an integer argument representing the length of the bot's prefixes/keys, then a list of handles you want the bot to use, preceded by the --handles argument. For example: `python3 twitter-markov.py 2 <twitter_handle1> <twitter_handle2>`. Once you have initially fed the bot with tweets, you can run the script without any command-line arguments, or build its dictionary even more!

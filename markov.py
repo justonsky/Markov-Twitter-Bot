@@ -20,10 +20,8 @@ def weighted_choice(choices, weights):
             return choice
 
 def parse_input(text, step):
-
     invalidRegex = re.compile(r'(@|\w+://)\S*')
-    text = text.lower()
-    results = [word.strip(r'&,[]()\/') for word in text.split() if not invalidRegex.match(word)]
+    results = [word.strip(r'[]():/\\"') for word in text.split() if not invalidRegex.match(word)]
 
     if len(results) < step:
         yield ParseLengthError('Length of text too small to parse'), ''
@@ -32,7 +30,6 @@ def parse_input(text, step):
         yield tuple(results[index - step:index]), results[index]
 
 def build_dict(words_dict, key, value):
-
     words_dict.setdefault(key, {})
     
     if value not in words_dict[key]:
@@ -56,8 +53,12 @@ def generate_sentence(words_dict, max_length=140):
 
         if len(str(next_word)) + len(result) >= max_length:
             break
+        
+        if '.' in sentence[-1]:
+            sentence += next_word[0].capitalize(),
+        else:
+            sentence += next_word
 
-        sentence += next_word
         start = start[1:] + next_word
         result = ' '.join(sentence)
 
