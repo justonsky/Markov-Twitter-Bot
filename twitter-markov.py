@@ -33,7 +33,6 @@ def dict_load(pickle_file):
         f = open(pickle_file, 'r+b')
     except FileNotFoundError:
         f = open(pickle_file, 'w+b')
-        f.close()
 
     try:
         data = pickle.load(f)
