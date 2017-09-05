@@ -28,18 +28,21 @@ def dict_save(data, pickle_file):
 def dict_load(pickle_file):
 
     data = {}
-    with open(pickle_file, 'r+b') as f:
 
-        try:
-            data = pickle.load(f)
-        except EOFError:
-            if args.handles is None:
-                print("The entries file is currently empty. Perhaps provide a few Twitter handles for our bot to look at?")
-                sys.exit(2)
-        except FileNotFoundError:
-            f = open(pickle_file, 'w+b')
-            f.close()
+    try:
+        f = open(pickle_file, 'r+b')
+    except FileNotFoundError:
+        f = open(pickle_file, 'w+b')
+        f.close()
 
+    try:
+        data = pickle.load(f)
+    except EOFError:
+        if args.handles is None:
+            print("The entries file is currently empty. Perhaps provide a few Twitter handles for our bot to look at?")
+            sys.exit(2)
+    
+    f.close()
     return data
 
 def train(api, data, person):
