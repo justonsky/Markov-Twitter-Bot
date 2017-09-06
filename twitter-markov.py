@@ -57,7 +57,8 @@ def train(api, data, person):
         try:
             tweets_list = api.GetUserTimeline(screen_name=person, 
                                         count=200, 
-                                        include_rts=False, 
+                                        include_rts=False,
+                                        exclude_replies=True, 
                                         max_id=oldest)
         except:
             print('Something went wrong getting {person}\'s tweets. Going to next person.'.format(person=person))
