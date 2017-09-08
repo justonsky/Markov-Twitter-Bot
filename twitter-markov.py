@@ -107,6 +107,11 @@ if __name__ == '__main__':
     while(True):
         # Generates a sentence, tweets it, then sleeps.
         text = markov.generate_sentence(data_table)
-        twitter_api.PostUpdate(text.capitalize())
+
+        try:
+            twitter_api.PostUpdate(text.capitalize())
+        except twitter.error.TwitterError:
+            pass
+
         print("New tweet: ", text)
         time.sleep(60)
