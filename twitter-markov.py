@@ -67,7 +67,7 @@ def train(api, data, person):
         total += len(tweets_list)
         check = oldest
         oldest = tweets_list[-1].id
-        tweet_text = [status.text for status in tweets_list]
+        tweet_text = [status.full_text for status in tweets_list]
 
         # Pass text from status update to markov chain dictionary
         for text in tweet_text:
@@ -93,7 +93,8 @@ if __name__ == '__main__':
                                 consumer_secret, 
                                 access_token_key, 
                                 access_token_secret, 
-                                sleep_on_rate_limit=True)
+                                sleep_on_rate_limit=True,
+                                tweet_mode='extended')
     except:
         print("Something went wrong with authentication. Did you set your environment variables properly?")
         sys.exit(2)
